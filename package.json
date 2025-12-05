@@ -1,0 +1,22 @@
+{
+    "name": "boxfitx-app-be",
+    "version": "1.0.0",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "dev": "npx tsc -b && node ./dist/index.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "devDependencies": {
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "@types/express": "^5.0.6",
+        "dotenv": "^17.2.3",
+        "express": "^5.2.1",
+        "mongoose": "^9.0.0"
+    }
+}
