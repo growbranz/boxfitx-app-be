@@ -1,1 +1,1 @@
-{"root":["./src/index.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/config/config.ts","./src/config/db.ts","./src/cron/membershipexpiry.cron.ts","./src/middleware/admins.ts","./src/models/admin.ts","./src/models/attendance.ts","./src/models/members.ts","./src/models/plans.ts","./src/models/user.ts","./src/routes/attendance.routes.ts","./src/routes/auth.routes.ts","./src/routes/dashboard.routes.ts","./src/routes/member.routes.ts","./src/routes/plan.routes.ts"],"version":"5.9.3"}
