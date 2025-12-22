@@ -1,9 +1,12 @@
 import express from "express";
 import { MemberModel } from "../models/members.js";
 import ExcelJS from "exceljs";
+import { userModel } from "../models/user.js";
+import bcrypt from "bcrypt";
+import { auth } from "../middleware/auth.js";
 export const MemberRouter = express.Router();
 //member creation post req (/api/members)
-MemberRouter.post("/", async (req, res) => {
+MemberRouter.post("/", auth(["admin"]), async (req, res) => {
     try {
         const payload = req.body;
         const member = await MemberModel.create(payload);
@@ -18,8 +21,42 @@ MemberRouter.post("/", async (req, res) => {
         });
     }
 });
+//create the login for the member
+MemberRouter.post("/create-member-login", auth(["admin"]), async (req, res) => {
+    try {
+        const { memberId, password } = req.body;
+        const member = await MemberModel.findById(memberId);
+        if (!member) {
+            return res.status(404).json({
+                message: "No Member Found",
+            });
+        }
+        const existing = await userModel.findOne({ email: member.email });
+        if (existing) {
+            return res.status(400).json({
+                message: "login already exists",
+            });
+        }
+        const hash = await bcrypt.hash(password, 10);
+        const User = await userModel.create({
+            email: member.email,
+            password: hash,
+            role: "member",
+            member: member._id,
+        });
+        res.status(201).json({
+            message: "Member Login Created Succesfully",
+            User,
+        });
+    }
+    catch (e) {
+        res.status(500).json({
+            erro: e.message,
+        });
+    }
+});
 //member update or edit post request (/api/members/:id)
-MemberRouter.post("/:id", async (req, res) => {
+MemberRouter.post("/:id", auth(["admin"]), async (req, res) => {
     try {
         const id = req.params.id;
         const update = req.body;
@@ -41,7 +78,7 @@ MemberRouter.post("/:id", async (req, res) => {
     }
 });
 //get the single member using the Id  get request(/api/member/:id)
-MemberRouter.get("/:id", async (req, res) => {
+MemberRouter.get("/:id", auth(["admin"]), async (req, res) => {
     try {
         const id = req.params.id;
         const member = await MemberModel.findById(id);
@@ -61,7 +98,7 @@ MemberRouter.get("/:id", async (req, res) => {
     }
 });
 // archieve the member (soft delete) patch request
-MemberRouter.patch("/:id/archive", async (req, res) => {
+MemberRouter.patch("/:id/archive", auth(["admin"]), async (req, res) => {
     try {
         const id = req.params.id;
         const Member = await MemberModel.findByIdAndUpdate(id, { archived: true }, { new: true });
@@ -81,7 +118,7 @@ MemberRouter.patch("/:id/archive", async (req, res) => {
     }
 });
 //assign the membership plans (or) set start/end date payment
-MemberRouter.post("/:id/assign", async (req, res) => {
+MemberRouter.post("/:id/assign", auth(["admin"]), async (req, res) => {
     try {
         const { id } = req.params;
         const { planType, startDate, expiryDate, paymentMode } = req.body;
@@ -116,7 +153,7 @@ MemberRouter.post("/:id/assign", async (req, res) => {
  * GET /api/members
  * Advanced member listing with filters, search & pagination
  */
-MemberRouter.get("/", async (req, res) => {
+MemberRouter.get("/", auth(["admin"]), async (req, res) => {
     try {
         const { search, planType, status, archived = "false", page = "1", limit = "20", sort = "-createdAt", minAge, maxAge, gender, } = req.query;
         // ✅ Build MongoDB query safely
@@ -186,7 +223,7 @@ MemberRouter.get("/", async (req, res) => {
     }
 });
 //export using the excel js
-MemberRouter.get("/export/excel", async (req, res) => {
+MemberRouter.get("/export/excel", auth(["admin"]), async (req, res) => {
     try {
         const { archived = "false" } = req.query;
         const members = await MemberModel.find({

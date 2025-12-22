@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 export declare const PlanModel: mongoose.Model<{
-    planName: string;
     isActive: boolean;
+    planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
     duration?: number | null;
     price?: number | null;
@@ -9,8 +9,8 @@ export declare const PlanModel: mongoose.Model<{
 } & mongoose.DefaultTimestampProps, {}, {}, {
     id: string;
 }, mongoose.Document<unknown, {}, {
-    planName: string;
     isActive: boolean;
+    planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
     duration?: number | null;
     price?: number | null;
@@ -20,8 +20,8 @@ export declare const PlanModel: mongoose.Model<{
 }, {
     timestamps: true;
 }> & Omit<{
-    planName: string;
     isActive: boolean;
+    planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
     duration?: number | null;
     price?: number | null;
@@ -35,15 +35,15 @@ export declare const PlanModel: mongoose.Model<{
 }, mongoose.Schema<any, mongoose.Model<any, any, any, any, any, any, any>, {}, {}, {}, {}, {
     timestamps: true;
 }, {
-    planName: string;
     isActive: boolean;
+    planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
     duration?: number | null;
     price?: number | null;
     benefits?: string | null;
 } & mongoose.DefaultTimestampProps, mongoose.Document<unknown, {}, {
-    planName: string;
     isActive: boolean;
+    planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
     duration?: number | null;
     price?: number | null;
@@ -53,8 +53,8 @@ export declare const PlanModel: mongoose.Model<{
 }, mongoose.ResolveSchemaOptions<{
     timestamps: true;
 }>> & Omit<{
-    planName: string;
     isActive: boolean;
+    planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
     duration?: number | null;
     price?: number | null;
@@ -69,8 +69,8 @@ export declare const PlanModel: mongoose.Model<{
     [path: string]: mongoose.SchemaDefinitionProperty<undefined, any, any>;
 } | {
     [x: string]: mongoose.SchemaDefinitionProperty<any, any, mongoose.Document<unknown, {}, {
-        planName: string;
         isActive: boolean;
+        planName: string;
         type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
         duration?: number | null;
         price?: number | null;
@@ -80,8 +80,8 @@ export declare const PlanModel: mongoose.Model<{
     }, mongoose.ResolveSchemaOptions<{
         timestamps: true;
     }>> & Omit<{
-        planName: string;
         isActive: boolean;
+        planName: string;
         type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
         duration?: number | null;
         price?: number | null;
@@ -94,8 +94,8 @@ export declare const PlanModel: mongoose.Model<{
         id: string;
     }> | undefined;
 }, {
-    planName: string;
     isActive: boolean;
+    planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
     duration?: number | null;
     price?: number | null;
@@ -107,8 +107,8 @@ export declare const PlanModel: mongoose.Model<{
 } & {
     __v: number;
 }>, {
-    planName: string;
     isActive: boolean;
+    planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
     duration?: number | null;
     price?: number | null;

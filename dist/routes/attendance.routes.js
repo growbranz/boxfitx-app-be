@@ -2,9 +2,11 @@ import express from "express";
 import multer from "multer";
 import csv from "csv-parser";
 import fs from "fs";
+import ExcelJS from "exceljs";
 import moment from "moment";
 import { MemberModel } from "../models/members.js";
 import { AttendanceModel } from "../models/attendance.js";
+import mongoose from "mongoose";
 export const AttendanceRouter = express.Router();
 const upload = multer({
     dest: "uploads/",
@@ -74,6 +76,147 @@ AttendanceRouter.post("/import", upload.single("file"), async (req, res) => {
     }
     catch (e) {
         return res.status(500).json({ error: e.message });
+    }
+});
+/**
+ * GET /api/attendance/summary
+ */
+AttendanceRouter.get("/summary", async (req, res) => {
+    try {
+        const date = req.query.date || moment().format("YYYY-MM-DD");
+        const totalMembers = await MemberModel.countDocuments({
+            status: "active",
+        });
+        const records = await AttendanceModel.find({ date });
+        const present = records.filter((r) => r.checkIn).length;
+        const checkedOut = records.filter((r) => r.checkOut).length;
+        const absent = totalMembers - present;
+        return res.json({
+            date,
+            totalMembers,
+            present,
+            absent,
+            checkedOut,
+        });
+    }
+    catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+/**
+ * GET /api/attendance/member/:memberId
+ */
+AttendanceRouter.get("/member/:memberId", async (req, res) => {
+    try {
+        const { memberId } = req.params;
+        const from = req.query.from;
+        const to = req.query.to;
+        const query = { member: memberId };
+        if (from && to) {
+            query.date = { $gte: from, $lte: to };
+        }
+        const history = await AttendanceModel.find(query).sort({ date: -1 });
+        res.json({
+            memberId,
+            totalDays: history.length,
+            records: history,
+        });
+    }
+    catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+/**
+ * GET /api/attendance/monthly
+ */
+AttendanceRouter.get("/monthly", async (req, res) => {
+    try {
+        const month = Number(req.query.month); // 1-12
+        const year = Number(req.query.year);
+        if (!month || !year) {
+            return res.status(400).json({ message: "Month and year required" });
+        }
+        const start = moment(`${year}-${month}-01`)
+            .startOf("month")
+            .format("YYYY-MM-DD");
+        const end = moment(start).endOf("month").format("YYYY-MM-DD");
+        const data = await AttendanceModel.aggregate([
+            {
+                $match: {
+                    date: { $gte: start, $lte: end },
+                    checkIn: { $ne: null },
+                },
+            },
+            {
+                $group: {
+                    _id: "$date",
+                    count: { $sum: 1 },
+                },
+            },
+            { $sort: { _id: 1 } },
+        ]);
+        res.json({
+            month,
+            year,
+            stats: data.map((d) => ({
+                date: d._id,
+                count: d.count,
+            })),
+        });
+    }
+    catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+/**
+ * GET /api/attendance/export/monthly
+ */
+AttendanceRouter.get("/export/monthly", async (req, res) => {
+    try {
+        const month = Number(req.query.month);
+        const year = Number(req.query.year);
+        if (!month || !year) {
+            return res.status(400).json({ message: "Month and year are required" });
+        }
+        const start = moment(`${year}-${month}-01`)
+            .startOf("month")
+            .format("YYYY-MM-DD");
+        const end = moment(start).endOf("month").format("YYYY-MM-DD");
+        const records = await AttendanceModel.find({
+            date: { $gte: start, $lte: end },
+        }).populate("member");
+        const workbook = new ExcelJS.Workbook();
+        const sheet = workbook.addWorksheet("Attendance");
+        /* ---------- HEADER ---------- */
+        sheet.columns = [
+            { header: "Member Name", key: "name", width: 25 },
+            { header: "Card ID", key: "cardId", width: 15 },
+            { header: "Date", key: "date", width: 15 },
+            { header: "Check In", key: "checkIn", width: 20 },
+            { header: "Check Out", key: "checkOut", width: 20 },
+            { header: "Status", key: "status", width: 15 },
+        ];
+        sheet.getRow(1).font = { bold: true };
+        /* ---------- DATA ---------- */
+        records.forEach((r) => {
+            const member = r.member;
+            sheet.addRow({
+                name: member?.fullName || "Unknown",
+                cardId: r.cardId,
+                date: r.date,
+                checkIn: r.checkIn ? moment(r.checkIn).format("hh:mm A") : "-",
+                checkOut: r.checkOut ? moment(r.checkOut).format("hh:mm A") : "-",
+                status: r.checkIn ? "Present" : "Absent",
+            });
+        });
+        /* ---------- RESPONSE ---------- */
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.setHeader("Content-Disposition", `attachment; filename=attendance-${month}-${year}.xlsx`);
+        await workbook.xlsx.write(res);
+        res.end();
+    }
+    catch (e) {
+        res.status(500).json({ error: e.message });
     }
 });
 //# sourceMappingURL=attendance.routes.js.map

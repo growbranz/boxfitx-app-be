@@ -1,7 +1,7 @@
 import express from "express";
 import { MemberModel } from "../models/members.js";
 export const DashboardRouter = express.Router();
-DashboardRouter.post("/summary", async (req, res) => {
+DashboardRouter.get("/summary", async (req, res) => {
     try {
         const [TotalMembers, ActiveMembers, InactiveMembers, ExpiredMembers] = await Promise.all([
             MemberModel.countDocuments({ archived: false }),

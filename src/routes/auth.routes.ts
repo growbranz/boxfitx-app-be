@@ -40,38 +40,53 @@ AuthRouter.post("/signup", async (req, res) => {
   }
 });
 
-AuthRouter.post("/signin", async (req, res) => {
+AuthRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({
-      message: "Required Fields should not be empty",
-    });
-  }
-  try {
-    const admin = await adminModel.findOne({
-      email,
-    });
-    if (!admin) {
-      return res.status(400).json({
-        message: "Invalid email or password",
-      });
+
+  /* ---------- ADMIN LOGIN ---------- */
+  const admin = await adminModel.findOne({ email });
+  if (admin) {
+    const match = await bcrypt.compare(password, admin.password);
+    if (!match) {
+      return res.status(401).json({ message: "Invalid credentials" });
     }
-    const comparePassword = await bcrypt.compare(password, admin.password);
-    if (!comparePassword) {
-      return res.status(400).json({
-        message: "Password not correct",
-      });
-    }
-    const token = jwt.sign({ id: admin._id }, JWT_ADMIN_PASSWORD, {
-      expiresIn: "7d",
-    });
-    res.status(200).json({
-      message: "login sucessfull",
+
+    const token = jwt.sign(
+      { id: admin._id, role: "admin" },
+      JWT_ADMIN_PASSWORD,
+      { expiresIn: "7d" }
+    );
+
+    return res.json({
+      role: "admin",
       token,
     });
-  } catch (e: any) {
-    res.status(500).json({
-      error: e.message,
-    });
   }
+
+  /* ---------- MEMBER LOGIN ---------- */
+  const user = await userModel.findOne({ email }).populate("member");
+  if (!user) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) {
+    return res.status(401).json({ message: "Invalid credentials" });
+  }
+
+  const token = jwt.sign(
+    {
+      id: user._id,
+      role: "member",
+      memberId: user.member,
+    },
+    JWT_ADMIN_PASSWORD,
+    { expiresIn: "7d" }
+  );
+
+  res.json({
+    role: "member",
+    token,
+    memberId: user.member,
+  });
 });
