@@ -10,6 +10,7 @@ import { AttendanceRouter } from "./routes/attendance.routes.js";
 import { userRouter } from "./routes/user.routes.js";
 import { TrainerRouter } from "./routes/trainer.routes.js";
 const app = express();
+const PORT = process.env.PORT || 3001;
 connectDB();
 app.use(cors());
 app.use(express.json());
@@ -25,7 +26,7 @@ app.get("/", (req, res) => {
         message: "Box fitx application works",
     });
 });
-app.listen(3000, () => {
-    console.log(`server listening on PORT 3000`);
+app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
 });
 //# sourceMappingURL=index.js.map

@@ -2,7 +2,7 @@ import express from "express";
 import { MemberModel } from "../models/members.js";
 import ExcelJS from "exceljs";
 import { userModel } from "../models/user.js";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { auth } from "../middleware/auth.js";
 
 export const MemberRouter = express.Router();
@@ -63,9 +63,9 @@ MemberRouter.post("/:id", auth(["admin"]), async (req, res) => {
   try {
     const id = req.params.id;
     const update = req.body;
-    const MemberFind = await MemberModel.findByIdAndUpdate(id, update,{
-      new:true,
-      runValidators:true
+    const MemberFind = await MemberModel.findByIdAndUpdate(id, update, {
+      new: true,
+      runValidators: true,
     });
     if (!MemberFind) {
       return res.status(404).json({

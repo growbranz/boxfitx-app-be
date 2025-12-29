@@ -2,7 +2,7 @@ import express from "express";
 import { userModel } from "../models/user.js";
 import { adminModel } from "../models/admin.js";
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { JWT_ADMIN_PASSWORD } from "../config/config.js";
 export const AuthRouter = express.Router();
 AuthRouter.post("/signup", async (req, res) => {
