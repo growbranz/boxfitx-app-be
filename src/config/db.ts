@@ -1,11 +1,15 @@
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const connectDB = async () => {
-  await mongoose
-    .connect(
-      "mongodb+srv://root:pejAKuqSDZTKFXbh@cluster0.a2nc4w2.mongodb.net/boxfitx"
-    )
-    .then(() => console.log("Mongodb connected"));
-};
+  const dbUrl = process.env.DATABASE_URL;
 
-// module.exports = connectDB;
+  if (!dbUrl) {
+    throw new Error("DATABASE_URL is not defined in environment variables");
+  }
+
+  await mongoose.connect(dbUrl);
+  console.log("MongoDB connected");
+};
