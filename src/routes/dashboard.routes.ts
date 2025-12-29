@@ -1,18 +1,25 @@
 import express from "express";
 import { MemberModel } from "../models/members.js";
+import { TrainerModel } from "../models/trainers.js";
 
 export const DashboardRouter = express.Router();
 
 DashboardRouter.get("/summary", async (req, res) => {
   try {
-    const [TotalMembers, ActiveMembers, InactiveMembers, ExpiredMembers] =
-      await Promise.all([
-        MemberModel.countDocuments({ archived: false }),
-        MemberModel.countDocuments({ status: "active", archived: false }),
-        MemberModel.countDocuments({ status: "inactive", archived: false }),
-        MemberModel.countDocuments({ status: "expired", archived: false }),
-      ]);
-    const TotalTrainers = 0; // not built the trainers endpoint
+    const [
+      TotalMembers,
+      ActiveMembers,
+      InactiveMembers,
+      ExpiredMembers,
+      TotalTrainers,
+    ] = await Promise.all([
+      MemberModel.countDocuments({ archived: false }),
+      MemberModel.countDocuments({ status: "active", archived: false }),
+      MemberModel.countDocuments({ status: "inactive", archived: false }),
+      MemberModel.countDocuments({ status: "expired", archived: false }),
+      TrainerModel.countDocuments({ archived: false }),
+    ]);
+
     res.status(200).json({
       data: {
         TotalMembers,

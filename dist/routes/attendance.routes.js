@@ -7,6 +7,7 @@ import moment from "moment";
 import { MemberModel } from "../models/members.js";
 import { AttendanceModel } from "../models/attendance.js";
 import mongoose from "mongoose";
+import { auth } from "../middleware/auth.js";
 export const AttendanceRouter = express.Router();
 const upload = multer({
     dest: "uploads/",
@@ -16,7 +17,7 @@ const upload = multer({
  * POST /api/attendance/import
  * multipart/form-data → file
  */
-AttendanceRouter.post("/import", upload.single("file"), async (req, res) => {
+AttendanceRouter.post("/import", upload.single("file"), auth(["admin"]), async (req, res) => {
     try {
         if (!req.file) {
             return res.status(400).json({ message: "File is required" });
@@ -97,6 +98,31 @@ AttendanceRouter.get("/summary", async (req, res) => {
             present,
             absent,
             checkedOut,
+        });
+    }
+    catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+/**
+ * GET /api/attendance/today
+ * Admin dashboard today attendance
+ */
+AttendanceRouter.get("/today", auth(["admin"]), async (req, res) => {
+    try {
+        const today = moment().format("YYYY-MM-DD");
+        const records = await AttendanceModel.find({ date: today })
+            .populate("member", "fullName")
+            .lean();
+        res.status(200).json({
+            date: today,
+            records: records.map((r) => ({
+                _id: r._id,
+                member: r.member,
+                checkIn: r.checkIn,
+                checkOut: r.checkOut,
+                source: r.source || "manual",
+            })),
         });
     }
     catch (e) {

@@ -60,7 +60,10 @@ MemberRouter.post("/:id", auth(["admin"]), async (req, res) => {
     try {
         const id = req.params.id;
         const update = req.body;
-        const MemberFind = await MemberModel.findByIdAndUpdate(id, update);
+        const MemberFind = await MemberModel.findByIdAndUpdate(id, update, {
+            new: true,
+            runValidators: true
+        });
         if (!MemberFind) {
             return res.status(404).json({
                 message: "Member Not found",

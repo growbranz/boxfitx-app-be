@@ -8,6 +8,7 @@ import { PlanRouter } from "./routes/plan.routes.js";
 import "./cron/membershipExpiry.cron.js";
 import { AttendanceRouter } from "./routes/attendance.routes.js";
 import { userRouter } from "./routes/user.routes.js";
+import { TrainerRouter } from "./routes/trainer.routes.js";
 const app = express();
 connectDB();
 app.use(cors());
@@ -17,6 +18,7 @@ app.use("/api/members", MemberRouter);
 app.use("/api/user", userRouter);
 app.use("/api/dashboard", DashboardRouter);
 app.use("/api/plans", PlanRouter);
+app.use("/api/trainers", TrainerRouter);
 app.use("/api/attendance", AttendanceRouter);
 app.get("/", (req, res) => {
     res.json({
