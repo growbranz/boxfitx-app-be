@@ -30,6 +30,12 @@ export declare const MemberModel: mongoose.Model<{
         paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
     } | null;
     cardId?: string | null;
+    reminders?: {
+        day7Sent: boolean;
+        day3Sent: boolean;
+        day1Sent: boolean;
+        lastReminderSentAt?: NativeDate | null;
+    } | null;
 } & mongoose.DefaultTimestampProps, {}, {}, {
     id: string;
 }, mongoose.Document<unknown, {}, {
@@ -63,6 +69,12 @@ export declare const MemberModel: mongoose.Model<{
         paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
     } | null;
     cardId?: string | null;
+    reminders?: {
+        day7Sent: boolean;
+        day3Sent: boolean;
+        day1Sent: boolean;
+        lastReminderSentAt?: NativeDate | null;
+    } | null;
 } & mongoose.DefaultTimestampProps, {
     id: string;
 }, {
@@ -98,6 +110,12 @@ export declare const MemberModel: mongoose.Model<{
         paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
     } | null;
     cardId?: string | null;
+    reminders?: {
+        day7Sent: boolean;
+        day3Sent: boolean;
+        day1Sent: boolean;
+        lastReminderSentAt?: NativeDate | null;
+    } | null;
 } & mongoose.DefaultTimestampProps & {
     _id: mongoose.Types.ObjectId;
 } & {
@@ -137,6 +155,12 @@ export declare const MemberModel: mongoose.Model<{
         paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
     } | null;
     cardId?: string | null;
+    reminders?: {
+        day7Sent: boolean;
+        day3Sent: boolean;
+        day1Sent: boolean;
+        lastReminderSentAt?: NativeDate | null;
+    } | null;
 } & mongoose.DefaultTimestampProps, mongoose.Document<unknown, {}, {
     email: string;
     fullName: string;
@@ -168,6 +192,12 @@ export declare const MemberModel: mongoose.Model<{
         paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
     } | null;
     cardId?: string | null;
+    reminders?: {
+        day7Sent: boolean;
+        day3Sent: boolean;
+        day1Sent: boolean;
+        lastReminderSentAt?: NativeDate | null;
+    } | null;
 } & mongoose.DefaultTimestampProps, {
     id: string;
 }, mongoose.ResolveSchemaOptions<{
@@ -203,6 +233,12 @@ export declare const MemberModel: mongoose.Model<{
         paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
     } | null;
     cardId?: string | null;
+    reminders?: {
+        day7Sent: boolean;
+        day3Sent: boolean;
+        day1Sent: boolean;
+        lastReminderSentAt?: NativeDate | null;
+    } | null;
 } & mongoose.DefaultTimestampProps & {
     _id: mongoose.Types.ObjectId;
 } & {
@@ -243,6 +279,12 @@ export declare const MemberModel: mongoose.Model<{
             paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
         } | null;
         cardId?: string | null;
+        reminders?: {
+            day7Sent: boolean;
+            day3Sent: boolean;
+            day1Sent: boolean;
+            lastReminderSentAt?: NativeDate | null;
+        } | null;
     } & mongoose.DefaultTimestampProps, {
         id: string;
     }, mongoose.ResolveSchemaOptions<{
@@ -278,6 +320,12 @@ export declare const MemberModel: mongoose.Model<{
             paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
         } | null;
         cardId?: string | null;
+        reminders?: {
+            day7Sent: boolean;
+            day3Sent: boolean;
+            day1Sent: boolean;
+            lastReminderSentAt?: NativeDate | null;
+        } | null;
     } & mongoose.DefaultTimestampProps & {
         _id: mongoose.Types.ObjectId;
     } & {
@@ -316,6 +364,12 @@ export declare const MemberModel: mongoose.Model<{
         paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
     } | null;
     cardId?: string | null;
+    reminders?: {
+        day7Sent: boolean;
+        day3Sent: boolean;
+        day1Sent: boolean;
+        lastReminderSentAt?: NativeDate | null;
+    } | null;
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {
@@ -353,6 +407,12 @@ export declare const MemberModel: mongoose.Model<{
         paymentMode?: "cash" | "card" | "Upi" | "Online_transfer" | null;
     } | null;
     cardId?: string | null;
+    reminders?: {
+        day7Sent: boolean;
+        day3Sent: boolean;
+        day1Sent: boolean;
+        lastReminderSentAt?: NativeDate | null;
+    } | null;
     createdAt: NativeDate;
     updatedAt: NativeDate;
 } & {

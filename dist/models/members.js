@@ -55,6 +55,12 @@ const MemberSchema = new mongoose.Schema({
         unique: true,
         sparse: true, // allows null
     },
+    reminders: {
+        day7Sent: { type: Boolean, default: false },
+        day3Sent: { type: Boolean, default: false },
+        day1Sent: { type: Boolean, default: false },
+        lastReminderSentAt: { type: Date },
+    },
 }, { timestamps: true });
 //virtual age (computed)
 MemberSchema.virtual("age").get(function () {
