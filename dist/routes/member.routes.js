@@ -158,19 +158,25 @@ MemberRouter.post("/:id/assign", auth(["admin"]), async (req, res) => {
  */
 MemberRouter.get("/", auth(["admin"]), async (req, res) => {
     try {
-        const { search, planType, status, archived = "false", page = "1", limit = "20", sort = "-createdAt", minAge, maxAge, gender, } = req.query;
+        const { search, planType, status, archived = "false", page = "1", limit = "20", sort = "-createdAt", minAge, maxAge, gender, year, month, } = req.query;
         // ✅ Build MongoDB query safely
         const query = {};
         // Archived filter
         query.archived = archived === "true";
         // Search filter (name, phone, email)
         if (search) {
-            const s = search.toString();
-            query.$or = [
-                { fullName: { $regex: s, $options: "i" } },
-                { number: { $regex: s, $options: "i" } },
-                { email: { $regex: s, $options: "i" } },
-            ];
+            const s = search.toString().trim();
+            // check if search is numeric (phone search)
+            const isNumberSearch = /^[0-9]+$/.test(s);
+            if (isNumberSearch) {
+                query.number = Number(s);
+            }
+            else {
+                query.$or = [
+                    { fullName: { $regex: s, $options: "i" } },
+                    { email: { $regex: s, $options: "i" } },
+                ];
+            }
         }
         // Membership plan filter
         if (planType) {
@@ -194,6 +200,21 @@ MemberRouter.get("/", auth(["admin"]), async (req, res) => {
             if (minAge) {
                 query.dob.$lte = new Date(now.getFullYear() - Number(minAge), now.getMonth(), now.getDate());
             }
+        }
+        /* ---------------- YEAR & MONTH FILTER ---------------- */
+        if (year) {
+            const y = Number(year);
+            let startDate = new Date(y, 0, 1); // Jan 1
+            let endDate = new Date(y + 1, 0, 1); // Jan 1 next year
+            if (month) {
+                const m = Number(month) - 1; // JS month = 0 based
+                startDate = new Date(y, m, 1);
+                endDate = new Date(y, m + 1, 1);
+            }
+            query["membership.startDate"] = {
+                $gte: startDate,
+                $lt: endDate,
+            };
         }
         // Pagination
         const pageNumber = Number(page);
@@ -228,15 +249,52 @@ MemberRouter.get("/", auth(["admin"]), async (req, res) => {
 //export using the excel js
 MemberRouter.get("/export/excel", auth(["admin"]), async (req, res) => {
     try {
-        const { archived = "false" } = req.query;
-        const members = await MemberModel.find({
-            archived: archived === "true",
-        }).lean({ virtuals: true });
+        const { search, planType, status, archived = "false", gender, year, month, } = req.query;
+        const query = {};
+        // Archived
+        query.archived = archived === "true";
+        // Search
+        if (search) {
+            const s = search.toString().trim();
+            const isNumberSearch = /^[0-9]+$/.test(s);
+            if (isNumberSearch) {
+                query.number = Number(s);
+            }
+            else {
+                query.$or = [
+                    { fullName: { $regex: s, $options: "i" } },
+                    { email: { $regex: s, $options: "i" } },
+                ];
+            }
+        }
+        // Filters
+        if (planType)
+            query["membership.planType"] = planType;
+        if (status)
+            query.status = status;
+        if (gender)
+            query.gender = gender;
+        // Year & Month
+        if (year) {
+            const y = Number(year);
+            let startDate = new Date(y, 0, 1);
+            let endDate = new Date(y + 1, 0, 1);
+            if (month) {
+                const m = Number(month) - 1;
+                startDate = new Date(y, m, 1);
+                endDate = new Date(y, m + 1, 1);
+            }
+            query["membership.startDate"] = {
+                $gte: startDate,
+                $lt: endDate,
+            };
+        }
+        const members = await MemberModel.find(query).lean({ virtuals: true });
+        /* ---------------- EXCEL ---------------- */
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet("Members");
         worksheet.columns = [
             { header: "Full Name", key: "fullName", width: 25 },
-            { header: "Age", key: "age", width: 8 },
             { header: "Gender", key: "gender", width: 10 },
             { header: "Phone", key: "number", width: 15 },
             { header: "Email", key: "email", width: 30 },
@@ -245,8 +303,6 @@ MemberRouter.get("/export/excel", auth(["admin"]), async (req, res) => {
             { header: "Expiry Date", key: "expiryDate", width: 15 },
             { header: "Status", key: "status", width: 12 },
             { header: "Payment Mode", key: "paymentMode", width: 15 },
-            { header: "Height (cm)", key: "heightCm", width: 12 },
-            { header: "Weight (kg)", key: "weightCm", width: 12 },
         ];
         members.forEach((m) => {
             worksheet.addRow({
@@ -263,12 +319,10 @@ MemberRouter.get("/export/excel", auth(["admin"]), async (req, res) => {
                     : "",
                 status: m.status,
                 paymentMode: m.membership?.paymentMode || "",
-                heightCm: m.heightCm,
-                weightCm: m.weightCm,
             });
         });
         res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        res.setHeader("Content-Disposition", "attachment; filename=members.xlsx");
+        res.setHeader("Content-Disposition", "attachment; filename=members_filtered.xlsx");
         await workbook.xlsx.write(res);
         res.end();
     }

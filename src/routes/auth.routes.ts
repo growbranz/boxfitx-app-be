@@ -4,25 +4,39 @@ import { adminModel } from "../models/admin.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { JWT_ADMIN_PASSWORD } from "../config/config.js";
+
 export const AuthRouter = express.Router();
+
+/* ===================== ADMIN SIGNUP ===================== */
 AuthRouter.post("/signup", async (req, res) => {
   const { firstName, lastName, email, password } = req.body;
+
+  // 🔐 BASIC VALIDATION
   if (!firstName || !lastName || !email || !password) {
     return res.status(400).json({
-      Message: "Required Fields should not be empty",
+      message: "All fields are required",
     });
   }
-  try {
-    const existingAdmin = await adminModel.findOne({
-      email,
+
+  // 🔐 PASSWORD STRENGTH CHECK
+  if (password.length < 8) {
+    return res.status(400).json({
+      message: "Password must be at least 8 characters long",
     });
+  }
+
+  try {
+    const existingAdmin = await adminModel.findOne({ email });
+
     if (existingAdmin) {
       return res.status(400).json({
         message: "Admin already exists",
       });
     }
+
     const hashedPassword = await bcrypt.hash(password, 10);
-    const Login = await adminModel.create({
+
+    const admin = await adminModel.create({
       firstName,
       lastName,
       email,
@@ -30,8 +44,8 @@ AuthRouter.post("/signup", async (req, res) => {
     });
 
     res.status(201).json({
-      message: "Signup sucessfull",
-      Login,
+      message: "Signup successful",
+      admin,
     });
   } catch (e: any) {
     res.status(500).json({
@@ -40,13 +54,21 @@ AuthRouter.post("/signup", async (req, res) => {
   }
 });
 
+/* ===================== LOGIN (ADMIN + MEMBER) ===================== */
 AuthRouter.post("/login", async (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({
+      message: "Email and password are required",
+    });
+  }
 
   /* ---------- ADMIN LOGIN ---------- */
   const admin = await adminModel.findOne({ email });
   if (admin) {
     const match = await bcrypt.compare(password, admin.password);
+
     if (!match) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -65,11 +87,13 @@ AuthRouter.post("/login", async (req, res) => {
 
   /* ---------- MEMBER LOGIN ---------- */
   const user = await userModel.findOne({ email }).populate("member");
+
   if (!user) {
     return res.status(401).json({ message: "Invalid credentials" });
   }
 
   const match = await bcrypt.compare(password, user.password);
+
   if (!match) {
     return res.status(401).json({ message: "Invalid credentials" });
   }

@@ -4,7 +4,7 @@ import { sendMail } from "../utils/mail.js";
 /**
  * Runs every day at 12:00 AM
  */
-cron.schedule("* * * * *", async () => {
+cron.schedule("0 0 * * *", async () => {
     console.log("🔄 Running daily membership expiry check...");
     try {
         const today = new Date();

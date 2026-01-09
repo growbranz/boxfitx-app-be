@@ -5,32 +5,38 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import { JWT_ADMIN_PASSWORD } from "../config/config.js";
 export const AuthRouter = express.Router();
+/* ===================== ADMIN SIGNUP ===================== */
 AuthRouter.post("/signup", async (req, res) => {
     const { firstName, lastName, email, password } = req.body;
+    // 🔐 BASIC VALIDATION
     if (!firstName || !lastName || !email || !password) {
         return res.status(400).json({
-            Message: "Required Fields should not be empty",
+            message: "All fields are required",
+        });
+    }
+    // 🔐 PASSWORD STRENGTH CHECK
+    if (password.length < 8) {
+        return res.status(400).json({
+            message: "Password must be at least 8 characters long",
         });
     }
     try {
-        const existingAdmin = await adminModel.findOne({
-            email,
-        });
+        const existingAdmin = await adminModel.findOne({ email });
         if (existingAdmin) {
             return res.status(400).json({
                 message: "Admin already exists",
             });
         }
         const hashedPassword = await bcrypt.hash(password, 10);
-        const Login = await adminModel.create({
+        const admin = await adminModel.create({
             firstName,
             lastName,
             email,
             password: hashedPassword,
         });
         res.status(201).json({
-            message: "Signup sucessfull",
-            Login,
+            message: "Signup successful",
+            admin,
         });
     }
     catch (e) {
@@ -39,8 +45,14 @@ AuthRouter.post("/signup", async (req, res) => {
         });
     }
 });
+/* ===================== LOGIN (ADMIN + MEMBER) ===================== */
 AuthRouter.post("/login", async (req, res) => {
     const { email, password } = req.body;
+    if (!email || !password) {
+        return res.status(400).json({
+            message: "Email and password are required",
+        });
+    }
     /* ---------- ADMIN LOGIN ---------- */
     const admin = await adminModel.findOne({ email });
     if (admin) {
