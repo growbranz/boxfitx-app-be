@@ -104,6 +104,72 @@ AttendanceRouter.post(
   }
 );
 
+AttendanceRouter.post("/checkin", auth(["member"]), async (req, res) => {
+  try {
+    const memberId =
+      typeof req.user.memberId === "string"
+        ? req.user.memberId
+        : req.user.memberId?._id;
+
+    const today = moment().format("YYYY-MM-DD");
+
+    let attendance = await AttendanceModel.findOne({
+      member: memberId,
+      date: today,
+    });
+
+    if (!attendance) {
+      attendance = await AttendanceModel.create({
+        member: memberId,
+        date: today,
+        checkIn: new Date(),
+        source: "manual",
+      });
+    } else if (!attendance.checkIn) {
+      attendance.checkIn = new Date();
+      await attendance.save();
+    } else {
+      return res.status(400).json({ message: "Already checked in" });
+    }
+
+    res.json({ message: "Check-in successful", attendance });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+//checkout particual user
+AttendanceRouter.post("/checkout", auth(["member"]), async (req, res) => {
+  try {
+    const memberId =
+      typeof req.user.memberId === "string"
+        ? req.user.memberId
+        : req.user.memberId?._id;
+
+    const today = moment().format("YYYY-MM-DD");
+
+    const attendance = await AttendanceModel.findOne({
+      member: memberId,
+      date: today,
+    });
+
+    if (!attendance || !attendance.checkIn) {
+      return res.status(400).json({ message: "Check-in first" });
+    }
+
+    if (attendance.checkOut) {
+      return res.status(400).json({ message: "Already checked out" });
+    }
+
+    attendance.checkOut = new Date();
+    await attendance.save();
+
+    res.json({ message: "Check-out successful", attendance });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 /**
  * GET /api/attendance/summary
  */

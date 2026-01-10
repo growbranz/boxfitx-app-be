@@ -19,6 +19,30 @@ TrainerRouter.post("/", auth(["admin"]), async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 });
+// /**
+//  * GET /api/trainers/public
+//  * List active trainers for users
+//  */
+
+// TrainerRouter.get(
+//   "/public/list",
+//   auth(["member", "admin"]),
+//   async (req, res) => {
+//     try {
+//       const trainers = await TrainerModel.find({
+//         archived: false,
+//         status: "active",
+//       });
+//       res.status(200).json({
+//         data: trainers,
+//       });
+//     } catch (e: any) {
+//       res.status(500).json({
+//         error: e.message,
+//       });
+//     }
+//   }
+// );
 
 /**
  * GET /api/trainers
@@ -44,6 +68,26 @@ TrainerRouter.get("/", auth(["admin"]), async (req, res) => {
     const trainers = await TrainerModel.find(query).sort("-createdAt");
 
     res.status(200).json({
+      total: trainers.length,
+      data: trainers,
+    });
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+/**
+ * GET /api/trainers/public/list
+ * Public trainer list for members
+ */
+TrainerRouter.get("/public/list", async (req, res) => {
+  try {
+    const trainers = await TrainerModel.find({
+      archived: false,
+      status: "active",
+    }).select("fullName speciality status");
+
+    res.json({
       total: trainers.length,
       data: trainers,
     });
