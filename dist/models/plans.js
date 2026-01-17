@@ -5,9 +5,6 @@ const PlanSchema = new mongoose.Schema({
         required: true,
         unique: true,
     },
-    duration: {
-        type: Number,
-    },
     price: { type: Number },
     type: {
         type: String,

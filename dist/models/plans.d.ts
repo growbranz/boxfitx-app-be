@@ -3,7 +3,6 @@ export declare const PlanModel: mongoose.Model<{
     isActive: boolean;
     planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-    duration?: number | null;
     price?: number | null;
     benefits?: string | null;
 } & mongoose.DefaultTimestampProps, {}, {}, {
@@ -12,7 +11,6 @@ export declare const PlanModel: mongoose.Model<{
     isActive: boolean;
     planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-    duration?: number | null;
     price?: number | null;
     benefits?: string | null;
 } & mongoose.DefaultTimestampProps, {
@@ -23,7 +21,6 @@ export declare const PlanModel: mongoose.Model<{
     isActive: boolean;
     planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-    duration?: number | null;
     price?: number | null;
     benefits?: string | null;
 } & mongoose.DefaultTimestampProps & {
@@ -38,14 +35,12 @@ export declare const PlanModel: mongoose.Model<{
     isActive: boolean;
     planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-    duration?: number | null;
     price?: number | null;
     benefits?: string | null;
 } & mongoose.DefaultTimestampProps, mongoose.Document<unknown, {}, {
     isActive: boolean;
     planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-    duration?: number | null;
     price?: number | null;
     benefits?: string | null;
 } & mongoose.DefaultTimestampProps, {
@@ -56,7 +51,6 @@ export declare const PlanModel: mongoose.Model<{
     isActive: boolean;
     planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-    duration?: number | null;
     price?: number | null;
     benefits?: string | null;
 } & mongoose.DefaultTimestampProps & {
@@ -72,7 +66,6 @@ export declare const PlanModel: mongoose.Model<{
         isActive: boolean;
         planName: string;
         type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-        duration?: number | null;
         price?: number | null;
         benefits?: string | null;
     } & mongoose.DefaultTimestampProps, {
@@ -83,7 +76,6 @@ export declare const PlanModel: mongoose.Model<{
         isActive: boolean;
         planName: string;
         type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-        duration?: number | null;
         price?: number | null;
         benefits?: string | null;
     } & mongoose.DefaultTimestampProps & {
@@ -97,7 +89,6 @@ export declare const PlanModel: mongoose.Model<{
     isActive: boolean;
     planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-    duration?: number | null;
     price?: number | null;
     benefits?: string | null;
     createdAt: NativeDate;
@@ -110,7 +101,6 @@ export declare const PlanModel: mongoose.Model<{
     isActive: boolean;
     planName: string;
     type?: "monthly" | "quarterly" | "half_yearly" | "annual" | null;
-    duration?: number | null;
     price?: number | null;
     benefits?: string | null;
     createdAt: NativeDate;
