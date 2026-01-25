@@ -382,7 +382,7 @@ AttendanceRouter.post("/biometric", async (req, res) => {
       return res.status(400).json({ message: "Card ID not found" });
     }
     const cardId = cardIdMatch[0];
-    const timestamp = receivedAt ? new Date(receivedAt) : new Date();
+    const timestamp = moment().tz("Asia/Kolkata").toDate();
 
     const date = moment(timestamp).tz("Asia/Kolkata").format("YYYY-MM-DD");
 
