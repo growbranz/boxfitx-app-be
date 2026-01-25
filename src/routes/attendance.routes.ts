@@ -3,11 +3,12 @@ import multer from "multer";
 import csv from "csv-parser";
 import fs from "fs";
 import ExcelJS from "exceljs";
-import moment from "moment";
+// import moment from "moment";
 import { MemberModel } from "../models/members.js";
 import { AttendanceModel } from "../models/attendance.js";
 import mongoose from "mongoose";
 import { auth } from "../middleware/auth.js";
+import moment from "moment-timezone";
 
 export const AttendanceRouter = express.Router();
 interface IMember {
@@ -382,7 +383,8 @@ AttendanceRouter.post("/biometric", async (req, res) => {
     }
     const cardId = cardIdMatch[0];
     const timestamp = receivedAt ? new Date(receivedAt) : new Date();
-    const date = moment(timestamp).format("YYYY-MM-DD");
+
+    const date = moment(timestamp).tz("Asia/Kolkata").format("YYYY-MM-DD");
 
     const member = await MemberModel.findOne({ cardId });
     if (!member) {
