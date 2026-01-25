@@ -101,7 +101,7 @@ AttendanceRouter.post(
     } catch (e: any) {
       return res.status(500).json({ error: e.message });
     }
-  }
+  },
 );
 
 AttendanceRouter.post("/checkin", auth(["member"]), async (req, res) => {
@@ -354,15 +354,65 @@ AttendanceRouter.get("/export/monthly", async (req, res) => {
     /* ---------- RESPONSE ---------- */
     res.setHeader(
       "Content-Type",
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     );
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename=attendance-${month}-${year}.xlsx`
+      `attachment; filename=attendance-${month}-${year}.xlsx`,
     );
 
     await workbook.xlsx.write(res);
     res.end();
+  } catch (e: any) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+AttendanceRouter.post("/biometric", async (req, res) => {
+  try {
+    const { rawData, receivedAt } = req.body;
+
+    /**
+     * Example RS-9W data contains Card ID or User ID
+     * You will adjust parsing later if needed
+     */
+    const cardIdMatch = rawData.match(/\d+/); // simple safe start
+    if (!cardIdMatch) {
+      return res.status(400).json({ message: "Card ID not found" });
+    }
+
+    const cardId = cardIdMatch[0];
+    const timestamp = receivedAt ? new Date(receivedAt) : new Date();
+    const date = moment(timestamp).format("YYYY-MM-DD");
+
+    const member = await MemberModel.findOne({ cardId });
+    if (!member) {
+      return res.status(404).json({ message: "Member not found" });
+    }
+
+    let attendance = await AttendanceModel.findOne({
+      member: member._id,
+      date,
+    });
+
+    if (!attendance) {
+      attendance = await AttendanceModel.create({
+        member: member._id,
+        cardId,
+        date,
+        checkIn: timestamp,
+        source: "biometric",
+      });
+    } else if (!attendance.checkIn) {
+      attendance.checkIn = timestamp;
+      attendance.source = "biometric";
+      await attendance.save();
+    } else if (!attendance.checkOut) {
+      attendance.checkOut = timestamp;
+      await attendance.save();
+    }
+
+    res.status(200).json({ success: true });
   } catch (e: any) {
     res.status(500).json({ error: e.message });
   }
