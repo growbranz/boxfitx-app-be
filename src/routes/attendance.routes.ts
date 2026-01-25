@@ -376,11 +376,10 @@ AttendanceRouter.post("/biometric", async (req, res) => {
      * Example RS-9W data contains Card ID or User ID
      * You will adjust parsing later if needed
      */
-    const cardIdMatch = rawData.match(/\d+/); // simple safe start
+    const cardIdMatch = rawData.match(/CARD\d+/i);
     if (!cardIdMatch) {
       return res.status(400).json({ message: "Card ID not found" });
     }
-
     const cardId = cardIdMatch[0];
     const timestamp = receivedAt ? new Date(receivedAt) : new Date();
     const date = moment(timestamp).format("YYYY-MM-DD");
