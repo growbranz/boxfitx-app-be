@@ -112,7 +112,7 @@ AttendanceRouter.post("/checkin", auth(["member"]), async (req, res) => {
         ? req.user.memberId
         : req.user.memberId?._id;
 
-    const today = moment().format("YYYY-MM-DD");
+    const today = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
 
     let attendance = await AttendanceModel.findOne({
       member: memberId,
@@ -147,7 +147,7 @@ AttendanceRouter.post("/checkout", auth(["member"]), async (req, res) => {
         ? req.user.memberId
         : req.user.memberId?._id;
 
-    const today = moment().format("YYYY-MM-DD");
+    const today = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
 
     const attendance = await AttendanceModel.findOne({
       member: memberId,
@@ -176,7 +176,8 @@ AttendanceRouter.post("/checkout", auth(["member"]), async (req, res) => {
  */
 AttendanceRouter.get("/summary", async (req, res) => {
   try {
-    const date = req.query.date || moment().format("YYYY-MM-DD");
+    const date =
+      req.query.date || moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
 
     const totalMembers = await MemberModel.countDocuments({
       status: "active",
@@ -206,7 +207,7 @@ AttendanceRouter.get("/summary", async (req, res) => {
  */
 AttendanceRouter.get("/today", auth(["admin"]), async (req, res) => {
   try {
-    const today = moment().format("YYYY-MM-DD");
+    const today = moment().tz("Asia/Kolkata").format("YYYY-MM-DD");
 
     const records = await AttendanceModel.find({ date: today })
       .populate("member", "fullName")
